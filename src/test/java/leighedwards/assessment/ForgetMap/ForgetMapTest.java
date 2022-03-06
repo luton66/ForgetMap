@@ -105,8 +105,8 @@ class ForgetMapTest {
         for (int i = 0; i < 100; i++) {
             service.submit(() -> {
                 forgetMap.find("test1");
-                // This like for debugging.
-                System.out.println(String.format("Thread: %s - Current usageCount: %s", Thread.currentThread().getName(), forgetMap.usageByKey("test1")));
+                // This line for debugging.
+                // System.out.println(String.format("Thread: %s - Current usageCount: %s", Thread.currentThread().getName(), forgetMap.usageByKey("test1")));
                 latch.countDown();
             });
         }

@@ -18,7 +18,3 @@ The Tie-Breaker implementation that is used is that if two values have the same 
 ---
 ###Notes
 I was noticing errors in my Unit tests, and implemented AtomicLong in the Usage Count to try and fix this. I then realised this was due to me missing a CountDownLatch in my Unit test. My code could be reverted to reverse the use of an AtomicLong, but have left that in as it is another way of handling asynchronous calls.
-
----
-###Further Improvements
-If I was to continue working on this, I would implement the required methods to make ForgetMap implement Iterable so that forEach could be run directly on ForgetMap.

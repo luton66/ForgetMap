@@ -39,7 +39,7 @@ public class ForgetMap<K, V> {
      * @param k a key to store the provided content against
      * @param v the value which will be provided content
      */
-    public synchronized void add(K k, V v) {
+    public synchronized void add(final K k, final V v) {
         ContentMap<V> content = new ContentMap<V>(v);
 
         if (cache.containsKey(k)) {
@@ -58,7 +58,7 @@ public class ForgetMap<K, V> {
      * @param k a provided key
      * @return any content stored in the local hashmap against the provided key
      */
-    public V find(K k) {
+    public V find(final K k) {
         ContentMap<V> contentMap = cache.get(k);
 
         if (contentMap == null) {
@@ -97,7 +97,7 @@ public class ForgetMap<K, V> {
      * @param k a provided Key
      * @return the number of times content associated with provided key has bene retrieved using the find method
      */
-    public long usageByKey(K k) {
+    public long usageByKey(final K k) {
         ContentMap<V> contentMap = cache.get(k);
 
         if (contentMap == null) {
@@ -118,11 +118,11 @@ public class ForgetMap<K, V> {
 
         // establishes all elements with least-used associations
         while (cache.size() >= maxAssociations) {
-            cache.keySet().forEach(key -> {
-                ContentMap<V> contentMap = cache.get(key);
+            cache.forEach((key, contentMap) -> {
                 if (contentMap.getUsageCount().get() == lowestUsage.get()) {
                     lowestUseKeys.add(key);
-                } else if (contentMap.getUsageCount().get() < lowestUsage.get()) {
+                }
+                else if (contentMap.getUsageCount().get() < lowestUsage.get()) {
                     lowestUseKeys.clear();
                     lowestUsage.set(contentMap.getUsageCount().get());
                     lowestUseKeys.add(key);
@@ -145,7 +145,7 @@ public class ForgetMap<K, V> {
      *
      * @param lowestUseKeys an ArrayList of keys
      */
-    private synchronized void implementTieBreaker(ArrayList<K> lowestUseKeys) {
+    private synchronized void implementTieBreaker(final ArrayList<K> lowestUseKeys) {
         AtomicReference<LocalDateTime> oldestElement = new AtomicReference<>(LocalDateTime.now());
         AtomicReference<K> keyToRemove = new AtomicReference<>(lowestUseKeys.get(0));
         if (lowestUseKeys.size() == 1) {
@@ -181,7 +181,7 @@ public class ForgetMap<K, V> {
          *
          * @param v the provided 'content' to be stored against the provided key in the ForgetMap
          */
-        ContentMap(V v) {
+        ContentMap(final V v) {
             this.timeAdded = LocalDateTime.now();
             this.contentValue = v;
             this.usageCount = new AtomicLong();
