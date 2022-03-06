@@ -17,4 +17,4 @@ The Tie-Breaker implementation that is used is that if two values have the same 
 
 ---
 ###Notes
-I was noticing errors in my Unit tests, and implemented AtomicLong in the Usage Count to try and fix this. I then realised this was due to me missing a CountDownLatch in my Unit test. My code could be reverted to reverse the use of an AtomicLong, but have left that in as it is another way of handling asynchronous calls.
+I was noticing errors in my Unit tests, and implemented AtomicLong in the Usage Count to try and fix this. I then realised this was due to me missing a CountDownLatch in my Unit test. However, as the implementation of the AtomicLong is still giving required results, I have left it at is.  
