@@ -1,18 +1,43 @@
 package leighedwards.assessment.ForgetMap;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.convert.DataSizeUnit;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class ForgetMapTest {
 
-    // Confirm data can be added to the Map and retrieved correctly.
+    ForgetMap<String, String> forgetMap;
 
-    // Confirm the Map never exceeds the number of max associations.
+    @Test
+    @DisplayName("Test that an element can be added and retrieved from map")
+    public void confirmAddElement() {
+        assert(false);
+    }
 
-    // Confirm the Map is successfully removing lowest usage values.
+    @Test
+    @DisplayName("Test that the map will not exceed the max number of associations")
+    public void confirmMaxAssociations() {
+        assert(false);
+    }
 
-    // Confirm the Map is successfully removing a value in the event of a tie breaker.
+    @Test
+    @DisplayName("Test that the map is successfuly removing lowest usage values")
+    public void confirmRemovalOfLowestUsageValues() {
+        assert(false);
+    }
 
-    // Confirm the usageCount is correct after a number of multi-threaded calls to the data contained in the
-    // Map
+    @Test
+    @DisplayName("Test that the map is removing a value in event of tie breaker")
+    public void confirmRemovalWithTieBreaker() {
+        assert(false);
+    }
 
+    @Test
+    @DisplayName("Confirm usage count is correct after asynchronous calls to map")
+    public void confirmAsynchronousUsageCount() {
+        assert(false);
+    }
 }
