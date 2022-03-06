@@ -1,4 +1,8 @@
-#Design and Implementation
+#Assessment
+####My code includes some basic unit tests to test the basic functionality of my ForgetMap. However, as I removed the redundant main class, the application will not 'build'. My code can be tested by running the unit tests direct from intelliJ. Or by running...
+`./gradlew test`
+
+##Design and Implementation
 The design that I implemented for this assessment is as follows...
 
 The "Forgetting Map" will be a HashMap that will contain the key provided by the user, and a seperate object containing the following...
