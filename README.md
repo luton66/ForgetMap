@@ -13,3 +13,8 @@ This will be an inner class as this is object will be exclusive to the Forgettin
 #Plan
 
 I have created skeleton classes that return a null class, and will use these to implement the tests that will confirm the desired outcome of the assessment.
+
+---
+###Notes
+
+I was noticing errors in my Unit tests, and implemented AtomicLong in in the Usage Count to try and fix this. I then realised this was due to me missing a CountDownLatch in my Unit test. My code could be reverted to reverse the use of an AtomicLong, but have left that in as it is another way of handling asynchronous calls.   

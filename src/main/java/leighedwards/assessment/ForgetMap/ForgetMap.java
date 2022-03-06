@@ -1,9 +1,11 @@
 package leighedwards.assessment.ForgetMap;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
 
 public class ForgetMap<K, V> {
@@ -22,6 +24,9 @@ public class ForgetMap<K, V> {
 
         if (cache.containsKey(k)) {
             LOGGER.info(String.format("Key: %s already found in ForgetMap, will override", k));
+        }
+        else if (cache.size() >= maxAssociations) {
+            removeLeastUsedValue();
         }
 
         cache.put(k, content);
@@ -58,6 +63,49 @@ public class ForgetMap<K, V> {
         }
         else {
             return contentMap.getUsageCount().get();
+        }
+    }
+
+    private synchronized void removeLeastUsedValue() {
+        AtomicLong lowestUsage = new AtomicLong(Long.MAX_VALUE);
+        final ArrayList<K> lowestUseKeys = new ArrayList<>();
+
+        while (cache.size() >= maxAssociations) {
+            cache.keySet().forEach(key -> {
+                ContentMap<V> contentMap = cache.get(key);
+                if (contentMap.getUsageCount().get() == lowestUsage.get()) {
+                    lowestUseKeys.add(key);
+                } else if (contentMap.getUsageCount().get() < lowestUsage.get()) {
+                    lowestUseKeys.clear();
+                    lowestUsage.set(contentMap.getUsageCount().get());
+                    lowestUseKeys.add(key);
+                }
+            });
+
+            if (lowestUseKeys.size() > 1) {
+                implementTieBreaker(lowestUseKeys);
+            }
+            else {
+                cache.remove(lowestUseKeys.get(0));
+            }
+        }
+    }
+
+    private void implementTieBreaker(ArrayList<K> lowestUseKeys) {
+        AtomicReference<LocalDateTime> oldestElement = new AtomicReference<>(LocalDateTime.now());
+        AtomicReference<K> keyToRemove = new AtomicReference<>(lowestUseKeys.get(0));
+        if (lowestUseKeys.size() == 1) {
+            cache.remove(lowestUseKeys.get(0));
+        }
+        else {
+            lowestUseKeys.forEach(key -> {
+                if (cache.get(key).getTimeAdded().isBefore(oldestElement.get())) {
+                    keyToRemove.set(key);
+                    oldestElement.set(cache.get(key).getTimeAdded());
+                }
+            });
+
+            cache.remove(keyToRemove.get());
         }
     }
 
