@@ -2,6 +2,8 @@ package leighedwards.assessment.ForgetMap;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -20,6 +22,21 @@ class ForgetMapTest {
 
         assertEquals(forgetMap.find("test1"), "test1 value");
     }
+
+    @Test
+    @DisplayName("Test that usage count correctly increments when find method is run")
+    public void confirmUsageCountIncrements() {
+        forgetMap = new ForgetMap<String, String>(3);
+        forgetMap.add("test1", "test value");
+
+        assertEquals(forgetMap.usageByKey("test1"), 0);
+
+        forgetMap.find("test1");
+        forgetMap.find("test1");
+
+        assertEquals(forgetMap.usageByKey("test1"), 2);
+    }
+
 
     @Test
     @DisplayName("Test that the map will not exceed the max number of associations")
@@ -74,22 +91,32 @@ class ForgetMapTest {
     }
 
     @Test
-    @DisplayName("Confirm usage count is correct after asynchronous calls to map")
+    @DisplayName("Confirm usage count is correct after multiple asynchronous calls to map")
     public void confirmAsynchronousUsageCount() {
         forgetMap = new ForgetMap<String, String>(2);
         forgetMap.add("test1", "test value");
 
         int numberOfThreads = 10;
-        ExecutorService service = Executors.newFixedThreadPool(numberOfThreads);
+        int loopCount = 10;
 
+        ExecutorService service = Executors.newFixedThreadPool(numberOfThreads);
+        CountDownLatch latch = new CountDownLatch(numberOfThreads * loopCount);
         // 100 calls to be made to find("test1") over 10 threads
         for (int i = 0; i < 100; i++) {
             service.submit(() -> {
                 forgetMap.find("test1");
-                // System.out.println(Thread.currentThread().getName());
+                // This like for debugging.
+                // System.out.println(String.format("Thread: %s - Current usageCount: %s", Thread.currentThread().getName(), forgetMap.usageByKey("test1")));
+                latch.countDown();
             });
         }
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            assert(false);
+        }
 
-        assertEquals(forgetMap.usageByKey("test1"), 100);
+        assertEquals(100, forgetMap.usageByKey("test1"));
     }
 }

@@ -1,11 +1,9 @@
 package leighedwards.assessment.ForgetMap;
 
-import jdk.jshell.spi.ExecutionControl;
-
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Logger;
 
 public class ForgetMap<K, V> {
@@ -20,12 +18,30 @@ public class ForgetMap<K, V> {
     }
 
     public synchronized void add(K k, V v) {
+        ContentMap<V> content = new ContentMap<V>(v);
+
         if (cache.containsKey(k)) {
             LOGGER.info(String.format("Key: %s already found in ForgetMap, will override", k));
         }
+
+        cache.put(k, content);
     }
 
-    public synchronized long size() {
+    public synchronized V find(K k) {
+        ContentMap<V> contentMap = cache.get(k);
+
+        if (contentMap == null) {
+            LOGGER.info(String.format("No element found for Key: %s", k));
+        }
+        else {
+            contentMap.incrementUsage();
+            return contentMap.getContentValue();
+        }
+
+        return null;
+    }
+
+    public long size() {
         return cache.size();
     }
 
@@ -34,32 +50,42 @@ public class ForgetMap<K, V> {
     }
 
     public synchronized long usageByKey(K k) {
-        return -1;
-    }
+        ContentMap<V> contentMap = cache.get(k);
 
-    public V find(K key) {
-        return null;
+        if (contentMap == null) {
+            LOGGER.info(String.format("No element found for Key: %s", k));
+            return -1;
+        }
+        else {
+            return contentMap.getUsageCount().get();
+        }
     }
 
     private class ContentMap<V> {
         private V contentValue;
         private LocalDateTime timeAdded;
-        private long usageCount;
+        private AtomicLong usageCount;
 
-        public V getContentValue() {
+        ContentMap(V v) {
+            this.timeAdded = LocalDateTime.now();
+            this.contentValue = v;
+            this.usageCount = new AtomicLong();
+        }
+
+        V getContentValue() {
             return contentValue;
         }
 
-        public LocalDateTime getTimeAdded() {
+        LocalDateTime getTimeAdded() {
             return timeAdded;
         }
 
-        public long getUsageCount() {
+        AtomicLong getUsageCount() {
             return usageCount;
         }
 
-        public void incrementUsage(int usageCount) {
-            // Thread-safe increment of content usage.
+        void incrementUsage() {
+            usageCount.incrementAndGet();
         }
     }
 }
